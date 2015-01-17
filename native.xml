@@ -7,6 +7,8 @@
 
 <target id="haxe">
 	<lib name="${haxelib:hxsdl}/SDL2/lib/x86/SDL2.lib"/>
+	<lib name="opengl32.lib"/>
+	<lib name="winmm.lib"/>
 </target>
 
 </xml>
