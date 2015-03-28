@@ -18,7 +18,12 @@ class Macros {
 		case EReturn(null):
 			return macro return null();
 		case EVars([v]) if( v.type != null ):
-			return macro LOCAL($i { v.name }, $i { typeString(v.type) } );
+			switch( v.type ) {
+			case TPath( { name : "ARR", params : [TPType(t), TPExpr( { expr : EConst(CInt(size)) } )] } ):
+				return macro LOCAL($i { v.name } [$v { Std.parseInt(size)}], $i { typeString(t) } );
+			default:
+				return macro LOCAL($i { v.name }, $i { typeString(v.type) } );
+			}
 		case EConst(CIdent(i = "endif")):
 			return { expr : EConst(CIdent("#"+i)), pos : e.pos };
 		case ECall({ expr : EConst(CIdent("ifdef")) },[{ expr : EConst(CIdent(i)) }]):
@@ -32,6 +37,14 @@ class Macros {
 		switch( t ) {
 		case TPath( { name : "PTR", params : [TPType(t)] } ):
 			return typeString(t)+"*";
+		case TPath( { name : "CONST", params : [TPType(t)] } ):
+			return "const "+typeString(t);
+		case TPath( { name : "UNSIGNED", params : [TPType(t)] } ):
+			return "unsigned "+typeString(t);
+		case TPath( { name : "ARR", params : [TPType(t),TPExpr({ expr : EConst(CInt(v)) })] } ):
+			return typeString(t) + "["+v+"]";
+		case TPath( { pack : [], name : n = "Char" | "Int" } ):
+			return n.toLowerCase();
 		case TPath( { pack : [], name : t } ):
 			return t;
 		default:

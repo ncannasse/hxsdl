@@ -37,4 +37,27 @@ class Sdl implements NativeWrapper {
 		@cpp SDL_Delay(time);
 	}
 
+
+	public static function getScreenWidth() : Int {
+		@cpp {
+			var e : SDL_DisplayMode;
+			SDL_GetCurrentDisplayMode(0, ADDR(e));
+			return e.w;
+		}
+		return 0;
+	}
+
+	public static function getScreenHeight() : Int {
+		@cpp {
+			var e : SDL_DisplayMode;
+			SDL_GetCurrentDisplayMode(0, ADDR(e));
+			return e.h;
+		}
+		return 0;
+	}
+
+	public static function message( title : String, text : String, error = false ) {
+		@cpp SDL_ShowSimpleMessageBox(error?SDL_MESSAGEBOX_ERROR:0, title.c_str(), text.c_str(), NULL);
+	}
+
 }

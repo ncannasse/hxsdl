@@ -22,6 +22,7 @@ class Window implements NativeWrapper {
 			glctx = SDL_GL_CreateContext(win);
 			if( glctx == NULL ) failwith("Failed to init GL Context (OpenGL 2.1 required)");
 		}
+		if( !GL.init() ) throw "Failed to init GL API";
 		windows.push(this);
 		vsync = true;
 	}
