@@ -23,6 +23,7 @@ class Sdl implements NativeWrapper {
 				}
 			}
 			callb();
+			@:privateAccess haxe.Timer.sync();
         }
 	}
 

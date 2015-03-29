@@ -110,10 +110,14 @@ class Test {
 
 		var rot = GL.getUniformLocation(pr, "rotation");
 
+
 		var oldTime = haxe.Timer.stamp();
 		var fps = 60.;
-		var spentTime = 0.;
 		var time = 0.;
+		var t = new haxe.Timer(1000);
+		t.run = function() {
+			trace("FPS = " + fps);
+		}
 		sdl.Sdl.loop(function() {
 			GL.clearColor(0, 0 ,(Math.sin(time*2) + 1) * 0.25, 1);
 			GL.clear(GL.COLOR_BUFFER_BIT);
@@ -124,14 +128,9 @@ class Test {
 			win.present();
 			var newTime = haxe.Timer.stamp();
 			var realFPS = 1 / (newTime - oldTime);
-			spentTime += newTime - oldTime;
 			time += newTime - oldTime;
 			oldTime = newTime;
 			fps = fps * 0.98 + realFPS * 0.02;
-			if( spentTime > 1 ) {
-				trace("FPS = " + fps);
-				spentTime -= 1;
-			}
 		});
 
 		win.destroy();

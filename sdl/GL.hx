@@ -56,12 +56,22 @@ class GL implements NativeWrapper {
 		return @cpp GLLoadAPI() == 0;
 	}
 
+	public static function isContextLost() {
+		// seems like a GL context is rarely lost on desktop
+		// let's look at it again on mobile
+		return false;
+	}
+
 	public static function clear( bits : Int ) {
 		@cpp glClear(bits);
 	}
 
 	public static function getError() : Int {
 		return @cpp glGetError();
+	}
+
+	public static function scissor( x : Int, y : Int, width : Int, height : Int ) {
+		@cpp glScissor(x, y, width, height);
 	}
 
 	public static function clearColor( r : Float, g : Float, b : Float, a : Float) {
