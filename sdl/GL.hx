@@ -250,8 +250,8 @@ class GL implements NativeWrapper {
 		@cpp glTexParameteri(t, key, value);
 	}
 
-	public static function texImage2D( t : Int, level : Int, internalFormat : Int, width : Int, height : Int, border : Int, format : Int, type : Int, image : Dynamic ) {
-		throw "TODO";
+	public static function texImage2D( target : Int, level : Int, internalFormat : Int, width : Int, height : Int, border : Int, format : Int, type : Int, image : haxe.io.BytesData ) {
+		@cpp glTexImage2D(target, level, internalFormat, width, height, border, format, type, ARR2PTR(image));
 	}
 
 	public static function generateMipmap( t : Int ) {

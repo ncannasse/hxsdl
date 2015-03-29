@@ -24,7 +24,7 @@
     <option noInlineOnDebug="False" />
     <option mainClass="Test" />
     <option enabledebug="False" />
-    <option additional="-lib hxsdl" />
+    <option additional="-lib hxsdl&#xA;-lib format" />
   </build>
   <!-- haxelib libraries -->
   <haxelib>

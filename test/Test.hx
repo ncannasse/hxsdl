@@ -5,22 +5,23 @@ class Test {
 	static var VSHADER = "
 		attribute vec2 position;
 		attribute vec2 uv;
-		varying vec4 color;
+		varying vec2 tuv;
 
 		uniform vec4 rotation[1];
 
 		void main() {
 			float r = rotation[0].x;
-			gl_Position = vec4(position.x * cos(r) + position.y * sin(r), position.x * sin(r) - position.y * cos(r), 0, 1);
-			color = vec4(uv.xy, 0, 1);
+			gl_Position = vec4(position.x * cos(r) + position.y * sin(r), -position.x * sin(r) + position.y * cos(r), 0, 1);
+			tuv = uv;
 		}
 	";
 
 	static var FSHADER = "
-		varying vec4 color;
+		varying vec2 tuv;
+		uniform sampler2D tex;
 		void main()
 		{
-			gl_FragColor = color;
+			gl_FragColor = texture(tex, tuv);
 		}
 	";
 
@@ -61,7 +62,11 @@ class Test {
 		GL.useProgram(pr);
 
 		var buf = GL.createBuffer();
-		var arr : Array<cpp.Float32> = [0, 0.5, 1, 1, -0.5, -0.5, 0, 0, 0.5, -0.5, 1, 0];
+		var arr : Array<cpp.Float32> = [
+			0, 0.5, 0.5, 0,
+			0.5, -0.5, 1, 1,
+			-0.5, -0.5, 0, 1
+		];
 		GL.bindBuffer(GL.ARRAY_BUFFER, buf);
 		GL.bufferData(GL.ARRAY_BUFFER, arr, GL.STATIC_DRAW);
 
@@ -76,6 +81,32 @@ class Test {
 
 		GL.vertexAttribPointer(pos, 2, GL.FLOAT, false, 16, 0);
 		GL.vertexAttribPointer(uv, 2, GL.FLOAT, false, 16, 2 * 4);
+
+		var image = sys.io.File.getBytes("hxlogo.png");
+		var png = new format.png.Reader(new haxe.io.BytesInput(image)).read();
+		var pngHeader = format.png.Tools.getHeader(png);
+		var pngData = format.png.Tools.extract32(png);
+
+
+		// BGRA to RGBA
+		for( i in 0...pngData.length << 2 ) {
+			var b = pngData.get(i << 2);
+			var r = pngData.get((i << 2) + 2);
+			pngData.set(i << 2, r);
+			pngData.set((i << 2) + 2, b);
+		}
+
+		var tex = GL.createTexture();
+		GL.bindTexture(GL.TEXTURE_2D, tex);
+		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+		GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+		GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, pngHeader.width, pngHeader.height, 0, GL.RGBA, GL.UNSIGNED_BYTE, pngData.getData());
+		var tid = GL.getUniformLocation(pr, "tex");
+		GL.uniform1i(tid, 0);
+		GL.activeTexture(GL.TEXTURE0);
+
+		GL.enable(GL.BLEND);
+		GL.blendFunc(GL.SRC_ALPHA, GL.ONE_MINUS_SRC_ALPHA);
 
 		var rot = GL.getUniformLocation(pr, "rotation");
 

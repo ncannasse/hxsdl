@@ -1,3 +1,4 @@
 -cpp bin
 -main Test
 -lib hxsdl
+-lib format
