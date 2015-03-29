@@ -18,12 +18,15 @@ class Macros {
 		case EReturn(null):
 			return macro return null();
 		case EVars([v]) if( v.type != null ):
-			switch( v.type ) {
+			var e = switch( v.type ) {
 			case TPath( { name : "ARR", params : [TPType(t), TPExpr( { expr : EConst(CInt(size)) } )] } ):
-				return macro LOCAL($i { v.name } [$v { Std.parseInt(size)}], $i { typeString(t) } );
+				macro LOCAL($i { v.name } [$v { Std.parseInt(size)}], $i { typeString(t) } );
 			default:
-				return macro LOCAL($i { v.name }, $i { typeString(v.type) } );
-			}
+				macro LOCAL($i { v.name }, $i { typeString(v.type) } );
+			};
+			if( v.expr == null )
+				return e;
+			return macro LOCALINIT($e, $i { haxe.macro.ExprTools.toString(mapCpp(v.expr)) } );
 		case EConst(CIdent(i = "endif")):
 			return { expr : EConst(CIdent("#"+i)), pos : e.pos };
 		case ECall({ expr : EConst(CIdent("ifdef")) },[{ expr : EConst(CIdent(i)) }]):
@@ -45,8 +48,10 @@ class Macros {
 			return typeString(t) + "["+v+"]";
 		case TPath( { pack : [], name : n = "Char" | "Int" } ):
 			return n.toLowerCase();
-		case TPath( { pack : [], name : t } ):
-			return t;
+		case TPath( { pack : [], name : t, params : pl } ):
+			if( pl.length == 0 )
+				return t;
+			return t + "<" + [for( p in pl ) switch( p ) { case TPExpr(e): "" + e; case TPType(t): typeString(t); } ].join(",") + ">";
 		default:
 			throw "Don't know how to convert " + haxe.macro.ComplexTypeTools.toString(t) + " to C type";
 		}

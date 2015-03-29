@@ -5,7 +5,7 @@ class Sdl implements NativeWrapper {
 	public static var isWindows(get, never) : Bool;
 	inline static function get_isWindows() : Bool return (untyped __cpp__("IS_WINDOWS") : Bool);
 
-	public static function init() {
+	@:keep public static function init() {
 		@cpp {
 			if( SDL_Init(SDL_INIT_EVERYTHING ) != 0 ) failwith("Failed to init SDL");
 			// Set the internal windows timer period to 1ms (will give accurate sleep for vsync)

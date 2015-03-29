@@ -1,28 +1,38 @@
 package sdl;
 
-abstract Uniform(Int) {
+abstract Uniform(Null<Int>) {
 }
 
-abstract Program(Int) {
+abstract Program(Null<Int>) {
 }
 
-abstract Shader(Int) {
+abstract Shader(Null<Int>) {
 }
 
-abstract Texture(Int) {
+abstract Texture(Null<Int>) {
 }
 
-abstract Buffer(Int) {
+abstract Buffer(Null<Int>) {
 }
 
-abstract Framebuffer(Int) {
+abstract Framebuffer(Null<Int>) {
 }
 
-abstract Renderbuffer(Int) {
+abstract Renderbuffer(Null<Int>) {
 }
 
 @:unreflective
 @:cppFileCode('
+
+
+static Dynamic GLRESULT( int v, int invalid ) {
+	if( v == invalid ) return null();
+	return Dynamic(v);
+}
+
+using hx::ArrayBase;
+using hx::ObjectPtr;
+
 #ifdef _WIN32
 extern "C" {
 #	define GL_IMPORT(fun, t) PFNGL##t##PROC fun
@@ -143,7 +153,7 @@ class GL implements NativeWrapper {
 	// program
 
 	public static function createProgram() : Program {
-		return @cpp glCreateProgram();
+		return @cpp GLRESULT(glCreateProgram(),0);
 	}
 
 	public static function attachShader( p : Program, s : Shader ) {
@@ -175,7 +185,7 @@ class GL implements NativeWrapper {
 		return null;
 	}
 
-	public static function getUniformLocation( p : Program, name : String ) : Null<Uniform> {
+	public static function getUniformLocation( p : Program, name : String ) : Uniform {
 		var u : Null<Uniform> = null;
 		@cpp {
 			var r : Int;
@@ -185,8 +195,14 @@ class GL implements NativeWrapper {
 		return u;
 	}
 
-	public static function getAttribLocation( p : Program, name : String ) : Int {
-		return @cpp glGetAttribLocation(p, name);
+	public static function getAttribLocation( p : Program, name : String ) : Null<Int> {
+		var u : Null<Int> = null;
+		@cpp {
+			var r : Int;
+			r = glGetAttribLocation(p, name);
+			if( r != -1 ) u = r;
+		}
+		return u;
 	}
 
 	public static function useProgram( p : Program ) {
@@ -197,7 +213,7 @@ class GL implements NativeWrapper {
 	// shader
 
 	public static function createShader( type : Int ) : Shader {
-		return @cpp glCreateShader(type);
+		return @cpp GLRESULT(glCreateShader(type),0);
 	}
 
 	public static function shaderSource( s : Shader, src : String ) {
@@ -243,7 +259,8 @@ class GL implements NativeWrapper {
 		@cpp {
 			var t : UNSIGNED<Int>;
 			glGenTextures(1, ADDR(t));
-			return t;
+			var tt : Int = t;
+			return tt;
 		}
 		throw "assert";
 	}
@@ -260,8 +277,13 @@ class GL implements NativeWrapper {
 		@cpp glTexParameteri(t, key, value);
 	}
 
-	public static function texImage2D( target : Int, level : Int, internalFormat : Int, width : Int, height : Int, border : Int, format : Int, type : Int, image : haxe.io.BytesData ) {
-		@cpp glTexImage2D(target, level, internalFormat, width, height, border, format, type, ARR2PTR(image));
+	public static function texImage2D( target : Int, level : Int, internalFormat : Int, width : Int, height : Int, border : Int, format : Int, type : Int, image : Array<Dynamic> ) {
+		if( image == null )
+			@cpp glTexImage2D(target, level, internalFormat, width, height, border, format, type, NULL);
+		else @cpp {
+			var a : ObjectPtr<ArrayBase> = image;
+			glTexImage2D(target, level, internalFormat, width, height, border, format, type, FIELD(a,GetBase()));
+		}
 	}
 
 	public static function generateMipmap( t : Int ) {
@@ -270,8 +292,7 @@ class GL implements NativeWrapper {
 
 	public static function deleteTexture( t : Texture ) {
 		@cpp {
-			var tt : UNSIGNED<Int>;
-			tt = t;
+			var tt : UNSIGNED<Int> = t;
 			glDeleteTextures(1,ADDR(tt));
 		}
 	}
@@ -282,7 +303,8 @@ class GL implements NativeWrapper {
 		@cpp {
 			var f : UNSIGNED<Int>;
 			glGenFramebuffers(1, ADDR(f));
-			return f;
+			var ff : Int = f;
+			return ff;
 		}
 		throw "assert";
 	}
@@ -297,8 +319,7 @@ class GL implements NativeWrapper {
 
 	public static function deleteFramebuffer( f : Framebuffer ) {
 		@cpp {
-			var ff : UNSIGNED<Int>;
-			ff = f;
+			var ff : UNSIGNED<Int> = f;
 			glDeleteFramebuffers(1,ADDR(ff));
 		}
 	}
@@ -309,7 +330,8 @@ class GL implements NativeWrapper {
 		@cpp {
 			var buf : UNSIGNED<Int>;
 			glGenRenderbuffers(1, ADDR(buf));
-			return buf;
+			var bb : Int = buf;
+			return bb;
 		}
 		throw "assert";
 	}
@@ -328,8 +350,7 @@ class GL implements NativeWrapper {
 
 	public static function deleteRenderbuffer( b : Renderbuffer ) {
 		@cpp {
-			var bb : UNSIGNED<Int>;
-			bb = b;
+			var bb : UNSIGNED<Int> = b;
 			glDeleteRenderbuffers(1, ADDR(bb));
 		}
 	}
@@ -340,7 +361,8 @@ class GL implements NativeWrapper {
 		@cpp {
 			var buf : UNSIGNED<Int>;
 			glGenBuffers(1, ADDR(buf));
-			return buf;
+			var bb : Int = buf;
+			return bb;
 		}
 		throw "assert";
 	}
@@ -353,16 +375,18 @@ class GL implements NativeWrapper {
 		@cpp glBufferData(target, size, NULL, param);
 	}
 
-	public static function bufferData( target : Int, data : Array<cpp.Float32>, param : Int ) {
-		@cpp glBufferData(target, data.__length()<<2, ARR2PTR(data), param);
+	public static function bufferData( target : Int, data : Array<Dynamic>, param : Int ) {
+		@cpp {
+			var a : ObjectPtr<ArrayBase> = data;
+			glBufferData(target, FIELD(a,length) * FIELD(a,GetElementSize()), FIELD(a,GetBase()), param);
+		}
 	}
 
-	public static function bufferDataUI16( target : Int, data : Array<cpp.UInt16>, param : Int ) {
-		@cpp glBufferData(target, data.__length()<<1, ARR2PTR(data), param);
-	}
-
-	public static function bufferSubData( target : Int, offset : Int, data : Array<cpp.Float32>, srcOffset : Int, srcLength : Int ) {
-		@cpp glBufferSubData(target, offset, srcLength<<2, ARR2PTR(data) + (srcOffset<<2));
+	public static function bufferSubData( target : Int, offset : Int, data : Array<Dynamic>, srcOffset : Int, srcLength : Int ) {
+		@cpp {
+			var a : ObjectPtr<ArrayBase> = data;
+			glBufferSubData(target, offset, srcLength, FIELD(a, GetBase()) + srcOffset);
+		}
 	}
 
 	public static function enableVertexAttribArray( attrib : Int ) {
@@ -379,8 +403,7 @@ class GL implements NativeWrapper {
 
 	public static function deleteBuffer( b : Buffer ) {
 		@cpp {
-			var bb : UNSIGNED<Int>;
-			bb = b;
+			var bb : UNSIGNED<Int> = b;
 			glDeleteBuffers(1,ADDR(bb));
 		}
 	}
@@ -391,8 +414,9 @@ class GL implements NativeWrapper {
 		@cpp glUniform1i(u, i);
 	}
 
-	public static function uniform4fv( u : Uniform, buffer : Array<cpp.Float32> ) {
-		@cpp glUniform4fv(u, buffer.__length()>>2, ARR2PTR(buffer));
+	public static function uniform4fv( u : Uniform, buffer : Array<cpp.Float32>, bufPos = 0, count = -1 ) {
+		if( count < 0 ) count = buffer.length>>2;
+		@cpp glUniform4fv(u, count, FLOATPTR(ARR2PTR(buffer) + bufPos));
 	}
 
 	// draw

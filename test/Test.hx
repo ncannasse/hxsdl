@@ -72,12 +72,16 @@ class Test {
 
 		var ibuf = GL.createBuffer();
 		GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, ibuf);
-		GL.bufferDataUI16(GL.ELEMENT_ARRAY_BUFFER, ([0, 1, 2] : Array<cpp.UInt16>), GL.STATIC_DRAW);
+		GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, ([0, 1, 2] : Array<cpp.UInt16>), GL.STATIC_DRAW);
 
 		var pos = GL.getAttribLocation(pr, "position");
 		var uv = GL.getAttribLocation(pr, "uv");
 		GL.enableVertexAttribArray(0);
 		GL.enableVertexAttribArray(1);
+
+		var unk = GL.getAttribLocation(pr, "unknown");
+		if( unk != null )
+			throw unk+" unknown should be null";
 
 		GL.vertexAttribPointer(pos, 2, GL.FLOAT, false, 16, 0);
 		GL.vertexAttribPointer(uv, 2, GL.FLOAT, false, 16, 2 * 4);

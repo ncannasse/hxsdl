@@ -1,3 +1,5 @@
+#ifndef SDL_Support
+#define SDL_Support
 #ifdef _WIN32
 #	include <windows.h>
 #	undef RegisterClass
@@ -14,6 +16,11 @@
 #undef NO_ERROR
 
 #define LOCAL(e,t)	t e
+#define LOCALINIT(l,v) l = v
 #define ADDR(e)	&(e)
-#define ARR2PTR(a) a.CheckGetPtr()->Pointer()
+#define ARR2PTR(a) ((unsigned char*)(a).CheckGetPtr()->Pointer())
 #define VOIDPTR(v)	((void*)(v))
+#define FLOATPTR(v)	((float*)(v))
+#define FIELD(a,b)	a->b
+
+#endif
