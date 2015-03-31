@@ -135,6 +135,17 @@ class Test {
 			time += newTime - oldTime;
 			oldTime = newTime;
 			fps = fps * 0.98 + realFPS * 0.02;
+		},function(e) {
+			var a : Dynamic = switch( e.type ) {
+			case MouseMove: { x : e.mouseX, y : e.mouseY };
+			case MouseDown, MouseUp: { but : e.button, x : e.mouseX, y : e.mouseY };
+			case MouseWheel: { delta : e.wheelDelta };
+			case KeyDown: { k : e.keyCode, repeat : e.keyRepeat };
+			case KeyUp: { k : e.keyCode };
+			case WindowState: e.state;
+			case Quit, MouseLeave: "";
+			}
+			trace(e.type+" " + a);
 		});
 
 		win.destroy();

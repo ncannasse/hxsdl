@@ -73,7 +73,7 @@ class Macros {
 			default:
 			}
 		}
-		cl.meta.add(":headerClassCode", [ { expr : EConst(CString([for( l in headerClassCode ) l + ";\n"].join(""))), pos : pos } ], pos);
+		if( headerClassCode.length > 0 ) cl.meta.add(":headerClassCode", [ { expr : EConst(CString([for( l in headerClassCode ) l + ";\n"].join(""))), pos : pos } ], pos);
 		cl.meta.add(":headerCode", [macro '#include <SDLSupport.h>'], pos);
 		if( cl.name == "Sdl" ) cl.meta.add(":buildXml", [macro "<include name=\"${haxelib:hxsdl}/native.xml\"/>"], pos);
 		return fields;
