@@ -14,6 +14,7 @@
 #define failwith(v)	hx::Throw(HX_CSTRING(v))
 #undef main
 #undef NO_ERROR
+#undef DELETE
 
 #define LOCAL(e,t)	t e
 #define LOCALINIT(l,v) l = v
