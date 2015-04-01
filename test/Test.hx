@@ -140,9 +140,18 @@ class Test {
 			case MouseMove: { x : e.mouseX, y : e.mouseY };
 			case MouseDown, MouseUp: { but : e.button, x : e.mouseX, y : e.mouseY };
 			case MouseWheel: { delta : e.wheelDelta };
-			case KeyDown: { k : e.keyCode, repeat : e.keyRepeat };
+			case KeyDown:
+				if( e.keyCode == 0x40000044 /*F11*/ )
+					win.fullScreen = !win.fullScreen;
+				{ k : e.keyCode, repeat : e.keyRepeat };
 			case KeyUp: { k : e.keyCode };
-			case WindowState: e.state;
+			case WindowState:
+				switch( e.state ) {
+				case Resize:
+					"Resize " + win.width + "x" + win.height;
+				default:
+					e.state;
+				}
 			case Quit, MouseLeave: "";
 			}
 			trace(e.type+" " + a);

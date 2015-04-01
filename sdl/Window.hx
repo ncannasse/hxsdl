@@ -8,6 +8,9 @@ class Window implements NativeWrapper {
 	@cpp var glctx : SDL_GLContext;
 	var lastFrame : Float;
 	public var vsync(default, set) : Bool;
+	public var width(get, never) : Int;
+	public var height(get, never) : Int;
+	public var fullScreen(default, set) : Bool;
 
 	public function new( title : String, width : Int, height : Int ) {
 		@cpp {
@@ -25,6 +28,32 @@ class Window implements NativeWrapper {
 		if( !GL.init() ) throw "Failed to init GL API";
 		windows.push(this);
 		vsync = true;
+	}
+
+	function set_fullScreen(b) {
+		if( b == fullScreen )
+			return b;
+		var k = 0;
+		if( b ) k = @cpp SDL_WINDOW_FULLSCREEN_DESKTOP;
+		if( @cpp SDL_SetWindowFullscreen(win, k) == 0 )
+			fullScreen = b;
+		return fullScreen;
+	}
+
+	public function resize( width : Int, height : Int ) {
+		@cpp SDL_SetWindowSize(win, width, height);
+	}
+
+	function get_width() {
+		var w = 0;
+		@cpp SDL_GetWindowSize(win, ADDR(w), NULL);
+		return w;
+	}
+
+	function get_height() {
+		var h = 0;
+		@cpp SDL_GetWindowSize(win, NULL, ADDR(h));
+		return h;
 	}
 
 	function set_vsync(v) {

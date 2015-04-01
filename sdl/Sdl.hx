@@ -24,7 +24,6 @@ class Sdl implements NativeWrapper {
 				untyped __cpp__('
 					SDL_Event e;
 					if( SDL_PollEvent(&e) == 0 ) break;
-					event->reset();
 					switch( e.type ) {
 					case SDL_QUIT:
 						event->type = EventType_obj::Quit;

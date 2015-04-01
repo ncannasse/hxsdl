@@ -1,6 +1,6 @@
 package sdl;
 
-class Event {
+@:keep class Event {
 	public var type : EventType;
 	public var mouseX : Int;
 	public var mouseY : Int;
@@ -11,8 +11,6 @@ class Event {
 	public var keyRepeat : Bool;
 	public var charCode : Int;
 	public function new() {
-	}
-	public function reset() {
 	}
 }
 
