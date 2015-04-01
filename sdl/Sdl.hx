@@ -36,12 +36,12 @@ class Sdl implements NativeWrapper {
 						break;
 					case SDL_KEYDOWN:
 						event->type = EventType_obj::KeyDown;
-						event->keyCode = e.key.keysym.sym & 0xFFFF;
+						event->keyCode = e.key.keysym.sym;
 						event->keyRepeat = e.key.repeat != 0;
 						break;
 					case SDL_KEYUP:
 						event->type = EventType_obj::KeyUp;
-						event->keyCode = e.key.keysym.sym & 0xFFFF;
+						event->keyCode = e.key.keysym.sym;
 						break;
 					case SDL_SYSWMEVENT:
 						continue;
