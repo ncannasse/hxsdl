@@ -38,6 +38,8 @@ class Macros {
 
 	static function typeString( t : ComplexType ) {
 		switch( t ) {
+		case TPath( { pack : pack, name : "NS", params : [TPType(t)] } ):
+			return pack.join("::")+"::"+typeString(t);
 		case TPath( { name : "PTR", params : [TPType(t)] } ):
 			return typeString(t)+"*";
 		case TPath( { name : "CONST", params : [TPType(t)] } ):
@@ -74,7 +76,16 @@ class Macros {
 			}
 		}
 		if( headerClassCode.length > 0 ) cl.meta.add(":headerClassCode", [ { expr : EConst(CString([for( l in headerClassCode ) l + ";\n"].join(""))), pos : pos } ], pos);
-		cl.meta.add(":headerCode", [macro '#include <SDLSupport.h>'], pos);
+		var headerCode = '#include <SDLSupport.h>';
+		for( m in cl.meta.get() )
+			if( m.name == ":headerCode" && m.params.length > 0 )
+				switch( m.params[0].expr ) {
+				case EConst(CString(s)):
+					headerCode += "\n" + s;
+					cl.meta.remove(m.name);
+				default:
+				}
+		cl.meta.add(":headerCode", [{ expr : EConst(CString(headerCode)), pos : pos }], pos);
 		if( cl.name == "Sdl" ) cl.meta.add(":buildXml", [macro "<include name=\"${haxelib:hxsdl}/native.xml\"/>"], pos);
 		return fields;
 	}
