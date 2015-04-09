@@ -30,9 +30,6 @@ static Dynamic GLRESULT( int v, int invalid ) {
 	return Dynamic(v);
 }
 
-using hx::ArrayBase;
-using hx::ObjectPtr;
-
 #ifdef _WIN32
 extern "C" {
 #	define GL_IMPORT(fun, t) PFNGL##t##PROC fun
@@ -280,9 +277,9 @@ class GL implements NativeWrapper {
 	public static function texImage2D( target : Int, level : Int, internalFormat : Int, width : Int, height : Int, border : Int, format : Int, type : Int, image : Array<Dynamic> ) {
 		if( image == null )
 			@cpp glTexImage2D(target, level, internalFormat, width, height, border, format, type, NULL);
-		else @cpp {
-			var a : ObjectPtr<ArrayBase> = image;
-			glTexImage2D(target, level, internalFormat, width, height, border, format, type, FIELD(a,GetBase()));
+		else {
+			var addr : cpp.Pointer<cpp.UInt8> = cpp.NativeArray.address(image, 0);
+			@cpp glTexImage2D(target, level, internalFormat, width, height, border, format, type, addr);
 		}
 	}
 
@@ -376,17 +373,14 @@ class GL implements NativeWrapper {
 	}
 
 	public static function bufferData( target : Int, data : Array<Dynamic>, param : Int ) {
-		@cpp {
-			var a : ObjectPtr<ArrayBase> = data;
-			glBufferData(target, FIELD(a,length) * FIELD(a,GetElementSize()), FIELD(a,GetBase()), param);
-		}
+		var addr : cpp.Pointer<cpp.UInt8> = cpp.NativeArray.address(data, 0);
+		var size = cpp.NativeArray.getBase(data).getByteCount();
+		@cpp glBufferData(target, size, addr, param);
 	}
 
 	public static function bufferSubData( target : Int, offset : Int, data : Array<Dynamic>, srcOffset : Int, srcLength : Int ) {
-		@cpp {
-			var a : ObjectPtr<ArrayBase> = data;
-			glBufferSubData(target, offset, srcLength, FIELD(a, GetBase()) + srcOffset);
-		}
+		var addr : cpp.Pointer<cpp.UInt8> = cpp.NativeArray.address(data, srcOffset);
+		@cpp glBufferSubData(target, offset, srcLength, addr);
 	}
 
 	public static function enableVertexAttribArray( attrib : Int ) {
@@ -415,8 +409,9 @@ class GL implements NativeWrapper {
 	}
 
 	public static function uniform4fv( u : Uniform, buffer : Array<cpp.Float32>, bufPos = 0, count = -1 ) {
-		if( count < 0 ) count = buffer.length>>2;
-		@cpp glUniform4fv(u, count, FLOATPTR(ARR2PTR(buffer) + bufPos));
+		if( count < 0 ) count = buffer.length >> 2;
+		var addr = cpp.NativeArray.address(buffer, bufPos);
+		@cpp glUniform4fv(u, count, addr);
 	}
 
 	// draw

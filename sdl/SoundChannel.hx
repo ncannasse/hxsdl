@@ -2,7 +2,7 @@ package sdl;
 
 @:cppFileCode('
 static void OnSDLAudio( void *userdata, Uint8 *stream, int len ) {
-	((sdl::SoundChannel_obj*)userdata)->onSample(stream, len);
+	((sdl::SoundChannel_obj*)userdata)->onSample(FLOATPTR(stream), len>>2);
 }
 ')
 class SoundChannel implements NativeWrapper {
@@ -33,7 +33,7 @@ class SoundChannel implements NativeWrapper {
 		');
 	}
 
-	function onSample( stream : cpp.Pointer<cpp.UInt8>, len : Int ) {
+	function onSample( stream : cpp.Pointer<cpp.Float32>, len : Int ) {
 	}
 
 	public function stop() {

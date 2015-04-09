@@ -19,7 +19,6 @@
 #define LOCAL(e,t)	t e
 #define LOCALINIT(l,v) l = v
 #define ADDR(e)	&(e)
-#define ARR2PTR(a) ((unsigned char*)(a).CheckGetPtr()->Pointer())
 #define VOIDPTR(v)	((void*)(v))
 #define FLOATPTR(v)	((float*)(v))
 #define FIELD(a,b)	a->b
