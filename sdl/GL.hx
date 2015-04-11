@@ -192,13 +192,9 @@ class GL implements NativeWrapper {
 		return u;
 	}
 
-	public static function getAttribLocation( p : Program, name : String ) : Null<Int> {
-		var u : Null<Int> = null;
-		@cpp {
-			var r : Int;
-			r = glGetAttribLocation(p, name);
-			if( r != -1 ) u = r;
-		}
+	public static function getAttribLocation( p : Program, name : String ) : Int {
+		var u : Int = -1;
+		@cpp (u = glGetAttribLocation(p, name));
 		return u;
 	}
 
@@ -392,6 +388,7 @@ class GL implements NativeWrapper {
 	}
 
 	public static function vertexAttribPointer( index : Int, size : Int, type : Int, normalized : Bool, stride : Int, position : Int ) {
+		//trace(index, size, type, normalized, stride, position);
 		@cpp glVertexAttribPointer(index, size, type, normalized, stride, VOIDPTR(position));
 	}
 
