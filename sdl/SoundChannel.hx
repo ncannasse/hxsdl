@@ -1,8 +1,11 @@
 package sdl;
 
 @:cppFileCode('
-static void OnSDLAudio( void *userdata, Uint8 *stream, int len ) {
+static void OnSDLAudio( void * userdata, Uint8 * stream, int len ) {
+	int base = 0;
+	hx::SetTopOfStack(&base,true);
 	((sdl::SoundChannel_obj*)userdata)->onSample(FLOATPTR(stream), len>>2);
+	hx::SetTopOfStack((int*)0,true);
 }
 ')
 class SoundChannel implements NativeWrapper {
