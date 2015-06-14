@@ -9,7 +9,6 @@ package sdl;
 	public var state : WindowStateChange;
 	public var keyCode : Int;
 	public var keyRepeat : Bool;
-	public var charCode : Int;
 	public function new() {
 	}
 }
