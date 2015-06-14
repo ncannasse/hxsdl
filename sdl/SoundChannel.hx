@@ -36,7 +36,7 @@ class SoundChannel implements NativeWrapper {
 		');
 	}
 
-	function onSample( stream : cpp.Pointer<cpp.Float32>, len : Int ) {
+	@:keep function onSample( stream : cpp.Pointer<cpp.Float32>, len : Int ) {
 	}
 
 	public function stop() {
