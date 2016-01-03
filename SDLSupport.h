@@ -8,7 +8,13 @@
 #	define IS_WINDOWS false
 #	define GL_GLEXT_PROTOTYPES
 #endif
-#include <GL/GLU.h>
+
+#ifdef __APPLE__
+#	include <OpenGL/glu.h>
+#else
+#	include <GL/GLU.h>
+#end
+
 #include <SDL.h>
 #include <glext.h>
 #define failwith(v)	hx::Throw(HX_CSTRING(v))
