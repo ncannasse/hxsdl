@@ -9,8 +9,11 @@
 	<lib name="${haxelib:hxsdl}/SDL2/lib/x86/SDL2.lib" if="windows"/>
 	<lib name="opengl32.lib" if="windows"/>
 	<lib name="winmm.lib" if="windows"/>
+	<lib name="-lSDL2" if="linux || android"/>	
 	<lib name="-lGL" if="linux || android"/>	
 	<vflag name="-framework" value="OpenGL" if="macos || ios"/>
+	<vflag name="-framework" value="SDL2" if="macos || ios"/>
+	<vflag name="-framework" value="Cocoa" if="macos || ios"/>
 </target>
 
 </xml>
