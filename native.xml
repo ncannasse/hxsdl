@@ -6,9 +6,11 @@
 </files>
 
 <target id="haxe">
-	<lib name="${haxelib:hxsdl}/SDL2/lib/x86/SDL2.lib"/>
-	<lib name="opengl32.lib"/>
-	<lib name="winmm.lib"/>
+	<lib name="${haxelib:hxsdl}/SDL2/lib/x86/SDL2.lib" if="windows"/>
+	<lib name="opengl32.lib" if="windows"/>
+	<lib name="winmm.lib" if="windows"/>
+	<lib name="-lGL" if="linux || android"/>	
+	<vflag name="-framework" value="OpenGL" if="macos || ios"/>
 </target>
 
 </xml>
