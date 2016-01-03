@@ -7,6 +7,8 @@
 #else
 #	define IS_WINDOWS false
 #	define GL_GLEXT_PROTOTYPES
+#	define timeBeginPeriod(_)
+#	define timeEndPeriod(_)
 #endif
 
 #ifdef __APPLE__

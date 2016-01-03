@@ -54,6 +54,10 @@ extern "C" {
 		return 0;
 	}
 }
+#else
+	int GLLoadAPI() {
+		return 0;
+	}
 #endif
 ')
 class GL implements NativeWrapper {
