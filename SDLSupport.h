@@ -13,7 +13,7 @@
 #	include <OpenGL/glu.h>
 #else
 #	include <GL/GLU.h>
-#end
+#endif
 
 #include <SDL.h>
 #include <glext.h>
